@@ -11,14 +11,20 @@ function App() {
   
   const [info , setInfo] = useState({});
 
+  const changeInfo=(e) =>{
+    // console.log(e.target.id);
+    // console.log(e.target.value);
+    setInfo({...info , [e.target.id] : e.target.value})
+  }
+
   useEffect(()=>{
     console.log(info);
   },[info])
 
   return(
     <div className='gap-2'>
-      <CustomInput name = {'Name of Student'} type={'text'} setInfo = {setInfo}/>
-      <CustomInput name = {'Mobile Number'} type={'number'} setInfo = {setInfo}/>
+      <CustomInput name = {'Name of Student'} type={'text'} handleChange = {changeInfo}/>
+      <CustomInput name = {'Mobile Number'} type={'number'} handleChange = {changeInfo}/>
     </div>
   )
 
