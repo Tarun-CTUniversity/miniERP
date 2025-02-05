@@ -5,9 +5,6 @@ const Example = () => {
   const [text, setText] = useState("  qw  dwedw");
   const [result,setResult] = useState(0);
 
-  //this is check comment - Changes maded by tushar
-  const [name, setName] = useState('Tushar');
-
   const expensiveComputation = (num) => {
     console.log("Running expensive computation...");
     for (let i = 0; i < 1000000000; i++) {} // Simulating heavy task
