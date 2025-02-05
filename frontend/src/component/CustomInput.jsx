@@ -49,7 +49,7 @@ const CustomInput = ({
       return `${baseStyle} border-grey cursor-not-allowed`; // If the field is disabled
     } else if (clicked && value && !valid[name]) {
       return `${baseStyle} border-green-400 cursor-text`; // If the input is clicked, has a value, and is valid
-    } else if ((required && clicked && !value) || valid[name]) {
+    } else if (clicked && ((required && !value) || valid[name])) {
       return `${baseStyle} border-red-400 cursor-text`; // If the field is required but no value entered or has validation error
     } else if (!required && clicked && !value) {
       return `${baseStyle} border-black cursor-text`; // If the field is not required and has no value
@@ -88,7 +88,9 @@ const CustomInput = ({
       />
 
       {/* Validation message */}
-      <p className="text-red-600 text-[12px] text-end -mt-[4px]">{valid[name]}</p>
+      {clicked && <p className="text-red-600 text-[12px] text-end -mt-[4px]">
+        {valid[name]}
+      </p>}
     </div>
   );
 };

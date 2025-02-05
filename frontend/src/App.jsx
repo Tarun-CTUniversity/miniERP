@@ -6,6 +6,7 @@ import './App.css'
 import CustomInput from './component/CustomInput'
 import Example from './component/Example'
 import CustomDropDown from './component/CustomDropDown'
+import CustomAutoComplete from './component/CustomAutoComplete'
 
 
 
@@ -14,11 +15,7 @@ function App() {
   const [info , setInfo] = useState({});
   const [valid,setValid] = useState({});
 
-  const options = [
-    { label: "Select School", value: "" },
-    { label: "School A", value: "school_a" },
-    { label: "School B", value: "school_b" }
-  ];
+  const options = ["Apple", "Banana", "Cherry", "Mango"];
 
 
   const changeInfo=(name,value) =>{
@@ -33,32 +30,37 @@ function App() {
     if (!info["school"]) {
       errors["school"] = "School is required.";
     }
+    if (!info["schoolName"]) {
+      errors["schoolName"] = "School is required.";
+    }
     setValid(errors);
   };
 
   useEffect(()=>{
     checkValidity();
     console.log(info);
+    console.log(valid);
   },[info])
-
-
-  // return (
-  //   <div className="gap-2">
-  //     <CustomDropDown
-  //       name="school"
-  //       options={options}
-  //       handleChange={changeInfo}
-  //       valid={valid}
-  //       required={true}
-  //     />
-  //   </div>
-  // );
 
   return(
     <div className='gap-2'>
       {/* <Example /> */}
       <CustomInput name = {'Name of Student'} type={'text'} handleChange = {changeInfo} valid={valid} />
       <CustomInput name = {'Mobile Number'} type={'number'} handleChange = {changeInfo} valid={valid} disabled = {true}/>
+      <CustomDropDown
+        name="schoolName"
+        options={options}
+        handleChange={changeInfo}
+        valid={valid}
+        required={true}
+      />
+
+      <CustomAutoComplete name="school"
+        options={options}
+        handleChange={changeInfo}
+        valid={valid}
+        required={true} />
+
     </div>
   )
 
