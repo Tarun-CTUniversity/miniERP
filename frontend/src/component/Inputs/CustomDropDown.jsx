@@ -63,6 +63,9 @@ const CustomDropDown = ({
         onFocus={() => {
           if (!clicked) setClicked(true);
         }}
+        onTouchStart={() => {
+          if (!clicked) setClicked(true);
+        }}
         onBlur={() => handleChange(name, selectedValue)} 
         style={{ fontSize: fontsize}}
       >

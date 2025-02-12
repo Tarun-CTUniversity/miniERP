@@ -1,16 +1,33 @@
 import { useEffect, useState } from 'react'
 import CreateSessionPage from './admin/BasicPages/sessionPage/CreateSessionPage'
 import LeftNavBar from './admin/navigationbar/LeftNavBar'
-import NavBar from './admin/navigationbar/NavBar'
 import './App.css'
-import CustomInput from './component/CustomInput'
-import Example from './component/Example'
-import CustomDropDown from './component/CustomDropDown'
-import CustomAutoComplete from './component/CustomAutoComplete'
+import SubmitButton from './component/Buttons/SubmitButton'
+import CancelButton from './component/Buttons/CancelButton'
+import BackButton from './component/Buttons/BackButton'
+import ToggleUserType from './component/ToggleUserType'
+import CustomToggleButton from './component/ToggleButtons/CustomToggleButton'
 
 
 
 function App() {
+  const [userType, setUserType] = useState("Student");
+  const handleSubmit = () =>{
+    console.log("data")
+  }
+
+  return(
+    <div>
+      <SubmitButton handleClick = {handleSubmit}/>
+      <CancelButton handleClick = {handleSubmit}/>
+      <BackButton handleClick = {handleSubmit}/>
+      <CustomToggleButton  
+        text1="Student"
+        text2="Teacher"
+        toggleValue={userType}
+        changeValue={setUserType}/>
+    </div>
+  )
   
   const [info , setInfo] = useState({});
   const [valid,setValid] = useState({});

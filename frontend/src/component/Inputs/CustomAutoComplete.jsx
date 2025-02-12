@@ -92,7 +92,12 @@ const CustomAutoComplete = ({
         required={required}
         disabled={disabled}
         className={STYLE}
-        onFocus={() => setClicked(true)} 
+        onFocus={() => {
+          if (!clicked) setClicked(true);
+        }} 
+        onTouchStart={() => {
+          if (!clicked) setClicked(true);
+        }}
         onBlur={() => handleChange(name, value)} 
         style={{ fontSize: fontsize , height:fontsize}}
       />

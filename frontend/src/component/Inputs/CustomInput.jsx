@@ -83,6 +83,10 @@ const CustomInput = ({
           
           if (!clicked) setClicked(true);
         }}
+        onTouchStart={() => {
+          if (!clicked) setClicked(true);
+        }}
+        
         onBlur={() => handleChange(name, value)} 
         style={{ fontSize: fontsize, height: fontsize }} 
       />
