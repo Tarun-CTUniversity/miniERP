@@ -5,8 +5,8 @@ import './App.css'
 import SubmitButton from './component/Buttons/SubmitButton'
 import CancelButton from './component/Buttons/CancelButton'
 import BackButton from './component/Buttons/BackButton'
-import ToggleUserType from './component/ToggleUserType'
 import CustomToggleButton from './component/ToggleButtons/CustomToggleButton'
+import AdminManageSessions from './SessionManagement/AdminManageSession'
 
 
 
@@ -16,7 +16,10 @@ function App() {
     console.log("data")
   }
 
+  return AdminManageSessions();
+
   return(
+
     <div>
       <SubmitButton handleClick = {handleSubmit}/>
       <CancelButton handleClick = {handleSubmit}/>
