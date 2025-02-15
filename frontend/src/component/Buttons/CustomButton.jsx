@@ -46,6 +46,7 @@ const CustomButton = ({
         padding: `${py} ${px}`,
         backgroundColor: clicked ? clickColor : bgColor,
         color: textColor,
+        marginBottom: 20,
       }}
       onMouseDown={handlePress}
       onMouseUp={handleRelease}
