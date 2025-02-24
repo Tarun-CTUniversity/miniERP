@@ -7,6 +7,7 @@ import CancelButton from './component/Buttons/CancelButton'
 import BackButton from './component/Buttons/BackButton'
 import CustomToggleButton from './component/ToggleButtons/CustomToggleButton'
 import AdminManageSessions from './SessionManagement/AdminManageSession'
+import Dep_management from './SessionManagement/Dep_management'
 
 
 
@@ -15,6 +16,8 @@ function App() {
   const handleSubmit = () =>{
     console.log("data")
   }
+
+  return Dep_management();
 
   return AdminManageSessions();
 
