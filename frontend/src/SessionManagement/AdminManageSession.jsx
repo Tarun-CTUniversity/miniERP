@@ -51,16 +51,15 @@
 //             <h1 className="text-2xl font-bold mb-4">Manage Sessions</h1>
 
 //             {/* Session Input */}
-//             <div className="mb-4">
-//                 <CustomInput name="Session (e.g. 2024-25)" handleSession="setSession(e.target.value)" placeholder="Enter session year" className="w-full px-3 py-2 border rounded-lg" />
-//                 {/* <label className="block font-medium mb-1">Session (e.g., 2025-26):</label> */}
-//                 {/* <input
+//             <div className="mb-4 w-full px-3 py-2 border rounded-lg">
+//                 {<label className="block font-medium mb-1">Session (e.g., 2025-26):</label>}
+//                 {<input
 //                     type="text"
 //                     className="w-full px-3 py-2 border rounded-lg"
 //                     value={session}
 //                     onChange={(e) => setSession(e.target.value)}
 //                     placeholder="Enter session year"
-//                 /> */}
+//                 />}
 //             </div>
 
 //             {/* Batch Toggle Button */}
