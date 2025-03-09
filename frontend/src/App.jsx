@@ -2,12 +2,7 @@ import { useEffect, useState } from 'react'
 import CreateSessionPage from './admin/BasicPages/sessionPage/CreateSessionPage'
 import LeftNavBar from './admin/navigationbar/LeftNavBar'
 import './App.css'
-import SubmitButton from './component/Buttons/SubmitButton'
-import CancelButton from './component/Buttons/CancelButton'
-import BackButton from './component/Buttons/BackButton'
-import CustomToggleButton from './component/ToggleButtons/CustomToggleButton'
-import AdminManageSessions from './SessionManagement/AdminManageSession'
-import Dep_management from './SessionManagement/Dep_management'
+import CreateSession from './pages/SessionManagementPages/SessionPages/CreateSession'
 
 
 
@@ -17,22 +12,8 @@ function App() {
     console.log("data")
   }
 
-  return Dep_management();
-
-  return AdminManageSessions();
-
   return(
-
-    <div>
-      <SubmitButton handleClick = {handleSubmit}/>
-      <CancelButton handleClick = {handleSubmit}/>
-      <BackButton handleClick = {handleSubmit}/>
-      <CustomToggleButton  
-        text1="Student"
-        text2="Teacher"
-        toggleValue={userType}
-        changeValue={setUserType}/>
-    </div>
+      <CreateSession />
   )
   
   const [info , setInfo] = useState({});

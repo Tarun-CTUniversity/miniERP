@@ -16,23 +16,23 @@ import React from "react";
 const CustomToggleButton = ({
   text1,
   text2,
-  toggleValue,
-  changeValue,
-  fontSize = "16px",
+  buttonValue,
+  setButtonValue,
+  textSize = "16px",
   px = "16px",
   py = "8px",
 }) => {
   return (
     <button
-      onClick={() => changeValue(toggleValue === text1 ? text2 : text1)}
+      onClick={() => setButtonValue(buttonValue === text1 ? text2 : text1)}
       className={`text-white font-semibold rounded-md transition-all duration-300 ${
-        toggleValue === text1
+        buttonValue === text1
           ? "bg-blue-500 hover:bg-blue-600"
           : "bg-green-500 hover:bg-green-600"
       }`}
-      style={{ fontSize, padding: `${py} ${px}` }}
+      style={{ fontSize : textSize , padding: `${py} ${px}` }}
     >
-      {toggleValue}
+      {buttonValue}
     </button>
   );
 };

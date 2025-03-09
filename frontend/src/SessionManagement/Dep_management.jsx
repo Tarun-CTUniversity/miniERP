@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CustomInput from "../component/Inputs/CustomInput";
 import CustomToggleButton from "../component/ToggleButtons/CustomToggleButton";
 
 const Dep_management = () => {
   const [departmentName, setDepartmentName] = useState("");
   const [departments, setDepartments] = useState([]);
-  
+  const [buttonValue , setButtonValue] = useState("Delete")
+
+  useEffect(()=>{
+    console.log(buttonValue);
+  })
   // Function to generate an abbreviation
   const generateAbbreviation = (name) => {
     return name
@@ -23,11 +27,6 @@ const Dep_management = () => {
     }
   };
 
-  // Handle delete department
-  const handleDelete = (abbr) => {
-    setDepartments(departments.filter((dept) => dept.abbr !== abbr));
-  };
-
   return (
     <div className="p-6">
       {/* Upper Div - Search/Create Department */}
@@ -40,16 +39,18 @@ const Dep_management = () => {
             handleChange={(name, value) => setDepartmentName(value)}
           />
           <CustomToggleButton
-            text1="Search/Create"
-            text2="Searching..."
-            toggleValue="Search/Create"
-            changeValue={handleSearchCreate}
-          />
+                text1="Delete"
+                text2="Confirm"
+                buttonValue= {buttonValue}
+                setButtonValue={setButtonValue}
+                px="100px"
+                
+              />
         </div>
       </div>
 
       {/* Lower Div - Manage Departments */}
-      <div className="bg-gray-200 p-4 rounded-lg">
+      {/* <div className="bg-gray-200 p-4 rounded-lg">
         <h2 className="text-xl font-bold mb-4">Manage Departments</h2>
         <div className="space-y-3">
           {departments.map((dept) => (
@@ -58,13 +59,13 @@ const Dep_management = () => {
               <CustomToggleButton
                 text1="Delete"
                 text2="Confirm"
-                toggleValue="Delete"
-                changeValue={() => handleDelete(dept.abbr)}
+                toggleValue= {buttonValue}
+                changeValue={setButtonValue}
               />
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 
 /**
  * CustomInput is a reusable form input component that displays an input field
@@ -11,7 +11,7 @@ import React, { useState, useMemo } from "react";
  * @param {string} placeholder - Placeholder text for the input field.
  * @param {boolean} required - Indicates whether the field is required or not (default is true).
  * @param {boolean} disabled - Indicates whether the field is disabled (default is false).
- * @param {string} fontsize - The font size for the input text (default is "16px").
+ * @param {string} textsize - The font size for the input text (default is "16px").
  * @param {object} valid - An object that holds validation errors for each input field. {name:Error}
  * 
  * @returns {JSX.Element} A custom input element that updates its state and validates based on given props.
@@ -19,22 +19,29 @@ import React, { useState, useMemo } from "react";
 const CustomInput = ({
   name,
   type = "text",
+  data = "",
   handleChange,
   placeholder = "",
   required = true,
   disabled = false,
-  fontsize = "16px",
+  textsize = "16px",
+  input_width = "200px",
   valid
 }) => {
 
   // Local state to manage the value of the input field.
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(data);
 
   // Base styling for the input field.
   const baseStyle = "border-2 border-solid rounded-xl text-base w-[90%] text-center py-4 ml-[2%]";
 
   // State to track if the input field has been clicked (focused) by the user.
   const [clicked, setClicked] = useState(false);
+  
+  
+  useEffect(()=>{
+    setValue(data);
+  },[data])
 
   /**
    * Memoized style computation to avoid unnecessary re-renders.
@@ -58,7 +65,7 @@ const CustomInput = ({
   }, [value, valid, clicked, disabled]);
 
   return (
-    <div className="w-[200px] gap-y-[5px] flex flex-col">
+    <div className="gap-y-[5px] flex flex-col" style={{width:input_width}}>
 
       {/* Input label with a red asterisk for required fields */}
       <p className="ml-[1%]">
@@ -88,7 +95,7 @@ const CustomInput = ({
         }}
         
         onBlur={() => handleChange(name, value)} 
-        style={{ fontSize: fontsize, height: fontsize }} 
+        style={{ fontSize: textsize, height: textsize }} 
       />
 
       {/* Validation message */}
