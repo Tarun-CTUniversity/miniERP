@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import CustomInput from '../../../component/Inputs/CustomInput';
 
-const SchoolCardForSession = ({ school: initialSchool, onDelete, onUpdate }) => {
+const SchoolCardForSession = ({ school: initialSchool, onDelete, onUpdate , valid }) => {
   const [school, setSchool] = useState(initialSchool);
-  const [valid,setValid] = useState({"School" : "" , "":""});
 
   // Notify parent component when school data changes
   useEffect(() => {
@@ -14,8 +13,8 @@ const SchoolCardForSession = ({ school: initialSchool, onDelete, onUpdate }) => 
     // Check if the abbreviation was auto-generated previously or is empty
     // If it was auto-generated or is empty, update it with the new name
     const shouldUpdateAbb = 
-      !school.abb || 
-      school.abb === school.name
+      !school.code || 
+      school.code === school.name
         .split(' ')
         .map((word) => word[0])
         .join('')
@@ -27,22 +26,19 @@ const SchoolCardForSession = ({ school: initialSchool, onDelete, onUpdate }) => 
           .map((word) => word[0])
           .join('')
           .toUpperCase()
-      : school.abb;
+      : school.code;
   
     setSchool((prev) => ({
       ...prev,
       name: value,
-      abb: newAbb,
+      code: newAbb,
     }));
   };
-  useEffect(()=>{
-    console.log(school);
-  })
 
   const handleAbbreviationChange = (name, value) => {
     setSchool((prev) => ({
       ...prev,
-      abb: value.toUpperCase(),
+      code: value.toUpperCase(),
     }));
   };
 
@@ -65,18 +61,18 @@ const SchoolCardForSession = ({ school: initialSchool, onDelete, onUpdate }) => 
           handleChange={handleSchoolNameChange}
           textsize="16px"
           input_width = "50%"
-          valid = {valid}
+          valid = {valid.name}
         />
 
         <CustomInput
-          name=""
+          name="Code"
           type="text"
           placeholder="Abbreviation"
-          data={school.abb}
+          data={school.code}
           handleChange={handleAbbreviationChange}
           textsize="16px"
           input_width = "25%"
-          valid = {valid}
+          valid = {valid.code}
           disabled = {school.name ? false : true}
         />
       </div>

@@ -12,7 +12,7 @@ import React, { useState, useMemo, useEffect } from "react";
  * @param {boolean} required - Indicates whether the field is required or not (default is true).
  * @param {boolean} disabled - Indicates whether the field is disabled (default is false).
  * @param {string} textsize - The font size for the input text (default is "16px").
- * @param {object} valid - An object that holds validation errors for each input field. {name:Error}
+ * @param {object} valid - A String of validation errors for each input field. {"Error"}
  * 
  * @returns {JSX.Element} A custom input element that updates its state and validates based on given props.
  */
@@ -52,11 +52,11 @@ const CustomInput = ({
    * - Required state (whether the field is required or not)
    */
   const STYLE = useMemo(() => {
-    if (disabled) {
+    if (disabled && !required) {
       return `${baseStyle} border-grey cursor-not-allowed`; // If the field is disabled
-    } else if (clicked && value && !valid[name]) {
+    } else if (clicked && value && !valid) {
       return `${baseStyle} border-green-400 cursor-text`; // If the input is clicked, has a value, and is valid
-    } else if (clicked && ((required && !value) || valid[name])) {
+    } else if (clicked && ((required && !value) || valid)) {
       return `${baseStyle} border-red-400 cursor-text`; // If the field is required but no value entered or has validation error
     } else if (!required && clicked && !value) {
       return `${baseStyle} border-black cursor-text`; // If the field is not required and has no value
@@ -100,7 +100,7 @@ const CustomInput = ({
 
       {/* Validation message */}
       {clicked && <p className="text-red-600 text-[12px] text-end -mt-[4px]">
-        {valid[name]}
+        {valid}
       </p>}
     </div>
   );
