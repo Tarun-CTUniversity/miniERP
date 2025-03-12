@@ -3,6 +3,8 @@ import CreateSessionPage from './admin/BasicPages/sessionPage/CreateSessionPage'
 import LeftNavBar from './admin/navigationbar/LeftNavBar'
 import './App.css'
 import CreateSession from './pages/SessionManagementPages/SessionPages/CreateSession'
+import AdminManageSession from "./SessionManagement/AdminManageSession"
+import AddSchoolInfo from './pages/SessionManagementPages/SchoolPages/AddSchoolInfo'
 
 
 
@@ -12,8 +14,11 @@ function App() {
     console.log("data")
   }
 
+  // return AdminManageSession()
+
   return(
-      <CreateSession />
+      <AddSchoolInfo/>
+      // <CreateSession />
   )
   
   const [info , setInfo] = useState({});
