@@ -147,7 +147,7 @@ we were unable to make good UI using the predefined that's why we created that b
 which we created using existing attributes */
 
 import React, { useState } from "react";
-import CustomToggleButton from "../component/ToggleButtons/CustomToggleButton"; 
+import CustomToggleButton from "../component/Buttons/CustomToggleButton"; 
 import CustomInput from "../component/Inputs/CustomInput";
 import CustomButton from "../component/Buttons/CustomButton";
 
