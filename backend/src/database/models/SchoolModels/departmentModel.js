@@ -4,7 +4,6 @@ const DepartmentSchema = new Schema({
     name: {
       type: String,
       required: true,
-      unique: true,
       trim: true
     },
     departmentCode:{
@@ -14,6 +13,7 @@ const DepartmentSchema = new Schema({
     },
     school: {
       type: Schema.Types.ObjectId,
+      required:true,
       ref: 'School',
       required: true
     },

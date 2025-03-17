@@ -5,6 +5,9 @@ import CancelButton from '../../../component/Buttons/CancelButton';
 import CreateButton from '../../../component/Buttons/CreateButton';
 import SchoolCardForSession from './SchoolCardForSession';
 import axios from 'axios';
+import { HOST } from '../../../constants/Constants';
+
+
 const CreateSession = () => {
   const SESSION_OPTIONS = ["Jan-June", "Sep-Dec"];
   const [session, setSession] = useState("Jan-June");
@@ -73,7 +76,7 @@ const CreateSession = () => {
     }
     
     try {
-      const response = await axios.post("http://localhost:4000/api/v1/basicInfo/session", {
+      const response = await axios.post(`${HOST}/api/v1/basicInfo/session`, {
         name: year + "," + session,
         schools: schools
       });

@@ -10,7 +10,7 @@ import React, { useState, useMemo } from "react";
  * @param {string} placeholder - Placeholder text for the dropdown (optional).
  * @param {boolean} required - Indicates whether the dropdown is required or not (default is true).
  * @param {boolean} disabled - Indicates whether the dropdown is disabled (default is false).
- * @param {string} fontsize - The font size for the dropdown text (default is "16px").
+ * @param {string} textsiz - The font size for the dropdown text (default is "16px").
  * @param {object} valid - An object that holds validation errors for each input field.
  * 
  * @returns {JSX.Element} A custom dropdown element with dynamic styling and validation.
@@ -23,7 +23,7 @@ const CustomDropDown = ({
   placeholder = "Select...",
   required = true,
   disabled = false,
-  fontsize = "16px"
+  textsize = "16px"
 }) => {
 
   const [selectedValue, setSelectedValue] = useState("");
@@ -56,6 +56,7 @@ const CustomDropDown = ({
         value={selectedValue}
         onChange={(e) => {
           setSelectedValue(e.target.value);
+          handleChange(name, e.target.value)
         }}
         required={required} 
         disabled={disabled} 
@@ -66,8 +67,7 @@ const CustomDropDown = ({
         onTouchStart={() => {
           if (!clicked) setClicked(true);
         }}
-        onBlur={() => handleChange(name, selectedValue)} 
-        style={{ fontSize: fontsize}}
+        style={{ fontSize: textsize}}
       >
         <option value="" disabled>{placeholder}</option>
 

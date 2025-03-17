@@ -23,7 +23,7 @@ router.route("/school/:id").get(getSchoolData);
 
 
 router.route("/department").post(createDepartment).put(updateDescriptionOfDepartment).get(getAllDepartmentData);
-router.route("/department/getDepartmentNames").get(getAllDepartmentNames);
+router.route("/department/getDepartmentNames/:schoolName").get(getAllDepartmentNames);
 router.route("/department/:id").get(getDepartmentData);
 
 

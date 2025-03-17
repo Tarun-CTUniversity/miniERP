@@ -7,7 +7,11 @@ const SchoolSchema = new Schema({
   name: {
     type: String,
     required: [true , "Give the name of School"],
-    unique: true,
+    trim: true
+  },
+  code: {
+    type: String,
+    required: [true , "Give the School Code"],
     trim: true
   },
   description:{

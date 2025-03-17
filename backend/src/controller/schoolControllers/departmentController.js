@@ -115,11 +115,9 @@ exports.addDepartmentSession = async (req, res, next) => {
  */
 exports.getAllDepartmentNames = async (req, res, next) => {
     try {
+        const name = req.params.schoolName;
+        console.log(name);
         const departments = await departmentModel.find().select("name _id session");
-
-        if (departments.length === 0) {
-            throw new AppError("No departments found", 404);
-        }
 
         res.status(200).json({
             success: true,

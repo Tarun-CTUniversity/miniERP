@@ -8,7 +8,6 @@ const sessionSchema = mongo.Schema({
     },
     schools:{
         type:[mongo.Schema.Types.ObjectId],
-        required:[true,"Please give the schools in this session"],
         ref:"School"
     }
 })

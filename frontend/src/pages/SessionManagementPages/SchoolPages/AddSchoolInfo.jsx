@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import CustomInput from "../../../component/Inputs/CustomInput";
 import CustomDropDown from "../../../component/Inputs/CustomDropDown";
@@ -7,23 +7,86 @@ import CreateButton from "../../../component/Buttons/CreateButton";
 import CreateSession from "../SessionPages/CreateSession";
 import DepartmentCardForSchool from "./DepartmentCardForSchool";
 import axios from "axios";
+import { HOST } from "../../../constants/Constants";
 
 const AddSchoolInfo = () => {
-  const SESSION = ["2024,Jan-June", "2024,Aug-Dec"];
-  const SCHOOLS = ["SOET", "SOP", "SOL"];
-  const SCHOOLNAME = {
-    "2024,Jan-June": [],
-    "2024,Aug-Dec": [],
-  };
-  const SCHOOLs = {
-    "2024,Jan-June": [],
-    "2024,Aug-Dec": [],
+  const [sessionData , setSessionData] = useState({SESSION:[] ,SCHOOLS : []});
+  const [session, setSession] = useState("");
+  const [school,setSchool] = useState("")
+  const [valid, setValid] = useState({ school: "", session: "", departments: [] });
+  const [departments, setDepartments] = useState([]);
+
+  const getSessionNames = async() =>{
+    try{
+      const resp = await axios.get(`${HOST}/api/v1/basicInfo/session/getSessionNames`);
+      setSessionData((prev) =>({...prev , SESSION:resp.data.data.map((data)=>data.name)}));
+    }catch(err){
+      alert("Server Not working Properly");
+      console.log(err);
+    }
+  }
+
+  const getSchoolNames = async(name) =>{
+    try{
+      const resp = await axios.get(`${HOST}/api/v1/basicInfo/session/getSessionByName/${name}`);
+      setSessionData((prev)=> ({...prev , SCHOOLS : resp.data.data.schools.map((school)=> school.name)}))
+    }catch(err){
+      alert("Server Not working Properly");
+      console.log(err);
+    }
+  }
+
+  const getDepartments = async(name) =>{
+    try{
+      const resp = await axios.get(`${HOST}/api/v1/basicInfo/department/getDepartmentNames/${session + "_" + name}`);
+      // setSessionData((prev) =>({...prev , SESSION:resp.data.data.map((data)=>data.name)}));
+      console.log(resp.data);
+    }catch(err){
+      alert("Server Not working Properly");
+      console.log(err);
+    }
+  }
+
+  const handleSession = (val) => {
+    if (sessionData.SESSION.includes(val)) {
+      setSession(val);
+      setValid((prev) => ({ ...prev, session: "" }));
+      getSchoolNames(val);
+    } else {
+      setValid((prev) => ({
+        ...prev,
+        session: "Please provide proper session Name",
+      }));
+    }
   };
 
-  const [session, setSession] = useState("Jan-June");
-  const [year, setYear] = useState("2025");
-  const [valid, setValid] = useState({ year: "", session: "", schools: [] });
-  const [schools, setSchools] = useState([]);
+  const handleSchool = (val) =>{
+    if(sessionData.SCHOOLS.includes(val)){
+      setSchool(val);
+      setValid((prev)=>({...prev,school:""}))
+      getDepartments(val);
+    }else{
+      setValid((prev) => ({
+        ...prev,
+        session: "Please provide proper School Name",
+      }));
+    }
+  }
+
+  useEffect(()=>{
+    getSessionNames();
+  },[])
+
+  useEffect(()=>{
+    console.log(departments);
+    console.log(valid)
+  })
+
+  
+
+
+ 
+  
 
   const validateSchoolData = () => {
     // Here just before submiting data we will validate all the data and check if school names / Codes are non Empty and Non Duplicate
@@ -113,49 +176,33 @@ const AddSchoolInfo = () => {
     }
   };
 
-  const handleYear = (value) => {
-    setYear(value);
-    if (value.length == 4) {
-      setValid((prev) => ({ ...prev, year: "" }));
-    } else {
-      setValid((prev) => ({ ...prev, year: "Please give proper Year" }));
-    }
-  };
-  const handleSession = (val) => {
-    if (SESSION_OPTIONS.includes(val)) {
-      setSession(val);
-      setValid((prev) => ({ ...prev, session: "" }));
-    } else {
-      setValid((prev) => ({
-        ...prev,
-        session: "Please provide proper session Name",
-      }));
-    }
-  };
+
+  
 
   // Add a new school card
-  const handleAddSchool = () => {
-    const newSchool = { name: "", code: "", des: "" };
-    setSchools((prevSchools) => [...prevSchools, newSchool]);
+  const handleAddDepartment = () => {
+    const newDepartment= { name: "", code: "", des: "" };
+    setDepartments((prev) => [...prev, newDepartment]);
 
-    const valid_schools = [...valid.schools, { name: "", code: "" }];
-    setValid((prev) => ({ ...prev, schools: valid_schools }));
+    const valid_Departments = [...valid.departments , { name: "", code: "" }];
+    setValid((prev) => ({ ...prev, departments: valid_Departments }));
   };
 
   // Update a school in the list
-  const handleUpdateSchool = (index, updatedSchool) => {
-    setSchools((prevSchools) => {
-      const updatedSchools = [...prevSchools];
-      updatedSchools[index] = updatedSchool;
-      return updatedSchools;
+  const handleUpdateDepartment = (index, newDepartment) => {
+    setDepartments((prev) => {
+      // const updated = [...prev];
+      prev[index] = newDepartment;
+      return prev;
     });
   };
 
   // Delete a school from the list
-  const handleDeleteSchool = (index) => {
-    setSchools((prevSchools) => prevSchools.filter((_, i) => i !== index));
-    const validSchools = valid.schools.filter((_, i) => i !== index);
-    setValid((prev) => ({ ...prev, schools: validSchools }));
+  const handleDeleteDepartment = (index) => {
+    setDepartments((prev) => prev.filter((_, i) => i !== index));
+
+    const validSchools = valid.departments.filter((_, i) => i !== index);
+    setValid((prev) => ({ ...prev, departments: validSchools }));
   };
 
   return (
@@ -175,15 +222,15 @@ const AddSchoolInfo = () => {
           <div className="flex">
           <CustomDropDown 
               name="Session"
-              options={SESSION}
+              options={sessionData.SESSION}
               handleChange={(n, val) => handleSession(val)}
               valid={valid.session}
             />
 
             <CustomDropDown
               name="School"
-              options={SCHOOLS}
-              handleChange={(n, val) => handleSession(val)}
+              options={sessionData.SCHOOLS}
+              handleChange={(n, val) => handleSchool(val)}
               valid={valid.session}
             />
           </div>
@@ -192,7 +239,7 @@ const AddSchoolInfo = () => {
         <div className="flex flex-col flex-1 border border-gray-300 rounded-lg p-4 relative">
           <div className="absolute top-4 right-4">
             <button
-              onClick={handleAddSchool}
+              onClick={handleAddDepartment}
               className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
             >
               + Add Department
@@ -200,15 +247,15 @@ const AddSchoolInfo = () => {
           </div>
 
           <div className="mt-10">
-            {schools.map((school, index) => (
+            {departments.map((department, index) => (
               <DepartmentCardForSchool
                 key={index}
-                school={school}
-                onDelete={() => handleDeleteSchool(index)}
-                onUpdate={(updatedSchool) =>
-                  handleUpdateSchool(index, updatedSchool)
+                department={department}
+                onDelete={() => handleDeleteDepartment(index)}
+                onUpdate={(updatedDepartment) =>
+                  handleUpdateDepartment(index, updatedDepartment)
                 }
-                valid={valid.schools[index]}
+                valid={valid.departments[index]}
               />
             ))}
           </div>
