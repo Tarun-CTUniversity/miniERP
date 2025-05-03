@@ -17,6 +17,8 @@ app.get("*",(req,res,next)=>{
     res.status(404).send("Server is connected but Page not found");
 })
 
+
+
 // Use ErrorMiddleware
 app.use(errorHandler);
 

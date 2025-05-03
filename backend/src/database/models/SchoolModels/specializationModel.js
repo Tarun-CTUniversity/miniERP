@@ -1,5 +1,6 @@
 // models/Specialization.js
-
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 const SpecializationSchema = new Schema({
     name:{
       type: String,
@@ -12,7 +13,7 @@ const SpecializationSchema = new Schema({
       ref: 'Programme',
       required: [true , "Give the program name"]
     },
-    specializationCode:{
+    code:{
       type:String,
       required: [true , "Give the Specialization Code"]
     },
@@ -28,8 +29,16 @@ const SpecializationSchema = new Schema({
     createdAt: {
       type: Date,
       default: Date.now
+    },
+    deleted: {
+      type: Boolean,
+      default: false
+    },
+    deletedAt: {
+      type: Date,
+      default: null
     }
-});
+}, { timestamps: true });
   
 module.exports = mongoose.model('Specialization', SpecializationSchema);
   

@@ -24,14 +24,22 @@ const SchoolSchema = new Schema({
       trim:true,
       ref:"sessionModel"
   },
-  departments:{
-    type:[mongoose.Schema.Types.ObjectId],
-    ref:"Department"
-  },
+  departments: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Department"
+  }],
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  deleted: {
+    type: Boolean,
+    default: false
+  },
+  deletedAt: {
+    type: Date,
+    default: null
   }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('School', SchoolSchema);

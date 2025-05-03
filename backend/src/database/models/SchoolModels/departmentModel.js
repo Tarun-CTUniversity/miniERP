@@ -6,7 +6,7 @@ const DepartmentSchema = new Schema({
       required: true,
       trim: true
     },
-    departmentCode:{
+    code:{
       type:String,
       required:true,
       trim: true
@@ -24,16 +24,25 @@ const DepartmentSchema = new Schema({
       type: Date,
       default: Date.now
     },
-    programs:{
-      type:[Schema.Types.ObjectId]
-    },
+    programs:[{
+      type:Schema.Types.ObjectId,
+      ref:"Programme"
+    }],
     session:{
       type:Schema.Types.ObjectId,
       required:[true , "Give the Session for which this department exists"],
       trim:true,
       ref:"sessionModel"
+    },
+    deleted: {
+      type: Boolean,
+      default: false
+    },
+    deletedAt: {
+      type: Date,
+      default: null
     }
-  });
+  }, { timestamps: true });
   
   module.exports = model('Department', DepartmentSchema);
   

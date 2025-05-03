@@ -65,7 +65,7 @@ const CustomInput = ({
   }, [value, valid, clicked, disabled]);
 
   return (
-    <div className="gap-y-[5px] flex flex-col" style={{width:input_width}}>
+    <div className="gap-y-[5px] flex flex-col" style={{width:input_width}} onClick={()=>console.log(valid)}>
 
       {/* Input label with a red asterisk for required fields */}
       <p className="ml-[1%]">
@@ -99,7 +99,7 @@ const CustomInput = ({
       />
 
       {/* Validation message */}
-      {clicked && <p className="text-red-600 text-[12px] text-end -mt-[4px]">
+      {valid && <p className="text-red-600 text-[12px] text-end -mt-[4px]">
         {valid}
       </p>}
     </div>

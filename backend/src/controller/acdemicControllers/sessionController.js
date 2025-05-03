@@ -3,6 +3,7 @@ const schoolModel = require("../../database/models/SchoolModels/schoolModel");
 const validateData = require("../../util/dataValidator");
 const AppError = require("../../util/ErrorHandler");
 const mongoose = require("mongoose");
+
 const VALID_SEMESTERS = ['Jan-June', 'Sep-Dec'];
 
 // Helper function to validate ObjectId
@@ -23,6 +24,8 @@ const findSessionById = async (id) => {
     }
     return session;
 };
+
+
 
 // Create a new session => Will create Session with all valid School names
 exports.createSession = async (req, res, next) => {
@@ -109,6 +112,8 @@ exports.createSession = async (req, res, next) => {
       next(err);
     }
 };
+
+
 // Add a school to a session
 exports.addSchool = async (req, res, next) => {
     try {
@@ -183,7 +188,20 @@ exports.getSessionNames = async (req, res, next) => {
 
 exports.getAllSessionData = async (req, res, next) => {
     try {
-        const sessions = await sessionModel.find().populate('schools');
+        const sessions = await sessionModel
+        .find()
+        .populate({
+          path: 'schools',
+          populate: {
+            path: 'departments',
+            populate: {
+              path: 'programs',
+              populate: {
+                path: 'specializations',
+              },
+            },
+          },
+        });
 
         if (sessions.length === 0) {
             throw new AppError("No sessions found", 404);
@@ -198,12 +216,18 @@ exports.getAllSessionData = async (req, res, next) => {
         next(err);
     }
 };
+
 // Get session data by name
 exports.getSessionDataByName = async (req, res, next) => {
     try {
         const { name } = req.params;
+        if (!name) {
+            throw new AppError("Session name is required", 400);
+          }
 
-        const session = await sessionModel.findOne({ name: name.trim() }).populate("schools" , "name");
+        const session = await sessionModel.findOne({ name: name.trim() }) 
+          .select("name")
+          .populate("schools" , "name code description deleted");
 
         if (!session) {
             throw new AppError("Session not found", 404);
@@ -219,19 +243,196 @@ exports.getSessionDataByName = async (req, res, next) => {
     }
 };
 
-// Get session data by ID
-exports.getSessionDataByID = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        checkSessionID(id);
-        const session = await sessionModel.findById(id).populate("schools");
 
+
+
+
+// Update Session Data
+exports.updateSessionData = async (req, res, next) => {
+  try {
+    const { name, existingSchools , addedSchools } = req.body;
+
+    if (!name) {
+      throw new AppError("Session name is required", 400);
+    }
+
+    const session = await sessionModel.findOne({ name: name.trim() });
+    if (!session) {
+      throw new AppError("No such Session Exists", 400);
+    }
+
+    // --- Step 1: Validate all schools before processing ---
+    const nameSet = new Set();
+    const codeSet = new Set();
+
+    for (const school of existingSchools) {
+      const schoolId = school.id;
+      const schoolName = school.name?.trim().toUpperCase();
+      const schoolCode = school.code?.trim().toUpperCase();
+
+      if (!schoolId || !schoolName || !schoolCode) {
+        throw new AppError("Each school must have id, name, and code", 400);
+      }
+
+      // Check for duplicates within request list
+      if (!isValidObjectId(schoolId) && nameSet.has(schoolName)) {
+        throw new AppError(`Duplicate school name in request: ${schoolName}`, 400);
+      }
+      if (!isValidObjectId(schoolId) && codeSet.has(schoolCode)) {
+        throw new AppError(`Duplicate school code in request: ${schoolCode}`, 400);
+      }
+
+      nameSet.add(schoolName);
+      codeSet.add(schoolCode);
+      if(isValidObjectId(schoolId)) {
+        continue; // Skip validation for existing schools
+      }
+
+      // Check for duplicates in the database
+        const [existingName, existingCode] = await Promise.all([
+          schoolModel.findOne({ name: schoolName, session: session._id }),
+          schoolModel.findOne({ code: schoolCode, session: session._id }),
+        ]);
+
+        if (existingName && existingName._id.toString() !== schoolId) {
+          throw new AppError(`A school with the name "${schoolName}" already exists in this session.`, 400);
+        }
+
+        if (existingCode && existingCode._id.toString() !== schoolId) {
+          throw new AppError(`A school with the code "${schoolCode}" already exists in this session.`, 400);
+        }
+    }
+
+    for (const school of addedSchools) {
+      const schoolId = school.id;
+      const schoolName = school.name?.trim().toUpperCase();
+      const schoolCode = school.code?.trim().toUpperCase();
+
+      if (!schoolId || !schoolName || !schoolCode) {
+        throw new AppError("Each school must have id, name, and code", 400);
+      }
+
+      // Check for duplicates within request list
+      if (!isValidObjectId(schoolId) && nameSet.has(schoolName)) {
+        throw new AppError(`Duplicate school name in request: ${schoolName}`, 400);
+      }
+      if (!isValidObjectId(schoolId) && codeSet.has(schoolCode)) {
+        throw new AppError(`Duplicate school code in request: ${schoolCode}`, 400);
+      }
+
+      nameSet.add(schoolName);
+      codeSet.add(schoolCode);
+      if(isValidObjectId(schoolId)) {
+        continue; // Skip validation for existing schools
+      }
+
+      // Check for duplicates in database
+      const existingName = await schoolModel.findOne({ name: schoolName ,session:session._id });
+      const existingCode = await schoolModel.findOne({ code: schoolCode , session:session._id });
+
+      if (existingName || existingCode) {
+        throw new AppError(`School with this name or code already exists: ${schoolName}`, 400);
+      }
+    }
+
+    // --- Step 2: Perform updates and collect new creates ---
+    const newSchoolPromises = [];
+    for (const school of addedSchools) {
+      const name = school.name.trim().toUpperCase();
+      const code = school.code.trim().toUpperCase();
+      const description = school.des;
+      const deleted = school.deleted || false;
+
+      if (isValidObjectId(school.id)) {
+        await schoolModel.findByIdAndUpdate(
+          school.id,
+          { name, code, description ,deleted , deletedAt: deleted ? school.deletedAt || new Date() : null },
+          { new: true, runValidators: true }
+        );
+      } else {
+        newSchoolPromises.push(
+          schoolModel.create({ name, code, description, session: session._id,deleted:deleted })
+        );
+      }
+    }
+
+    for (const school of existingSchools) {
+      const name = school.name.trim().toUpperCase();
+      const code = school.code.trim().toUpperCase();
+      const description = school.des;
+      const deleted = school.deleted || false;
+
+      if (isValidObjectId(school.id)) {
+        await schoolModel.findByIdAndUpdate(
+          school.id,
+          { name, code, description ,deleted , deletedAt: deleted ? school.deletedAt || new Date() : null },
+          { new: true, runValidators: true }
+        );
+      } else {
+        newSchoolPromises.push(
+          schoolModel.create({ name, code, description, session: session._id,deleted:deleted })
+        );
+      }
+    }
+
+    // Create new schools in parallel
+    const newSchools = await Promise.all(newSchoolPromises);
+    const newSchoolIds = newSchools.map(s => s._id);
+
+    // --- Step 3: Update session with new schools ---
+    const updatedSession = await sessionModel.findByIdAndUpdate(
+      session._id,
+      { $addToSet: { schools: { $each: newSchoolIds } } },
+      { new: true, runValidators: true }
+    ).populate("schools", "name code description deleted");
+
+    res.status(200).json({
+      success: true,
+      message: "Session data updated successfully",
+      data: updatedSession
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
+
+//Delete schools from session
+exports.deleteSchoolsFromSession = async (req, res, next) => {
+    try {
+        const { name, schools } = req.body;
+        const schoolId = schools.map((school)=>school.id);
+
+        const session = await sessionModel.findOne({name:name.trim()});
+        if (!session) {
+            throw new AppError("Session not found", 404);
+        }    
+        
+        //delete all the schools which are not inside the schools array
+        const sessionSchools = session.schools;
+        const schoolsToDelete = sessionSchools.filter((school)=> !schoolId.includes(school._id.toString()));
+
+        await Promise.all(
+          schoolsToDelete.map((schoolID) =>
+            schoolModel.findByIdAndUpdate(
+              schoolID,
+              { deleted: true, deletedAt: new Date() },
+              { new: true }
+            )
+          )
+        );
+
+        // Update the session to remove the deleted schools
+        session.schools = session.schools.filter((school) => !schoolsToDelete.includes(school.toString()));
+        await session.save();
+
+        const populatedSession = await sessionModel.findById(session._id).populate('schools', 'code description name deleted');
         res.status(200).json({
             success: true,
-            message: "Session data retrieved successfully",
-            data: session
+            message: "Schools deleted from session successfully",
+            data: populatedSession.schools
         });
     } catch (err) {
         next(err);
     }
-};
+}

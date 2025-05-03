@@ -1,5 +1,7 @@
+const sessionModel = require("../../database/models/AcadmicModel/sessionModel");
 const departmentModel = require("../../database/models/SchoolModels/departmentModel");
 const programModel = require("../../database/models/SchoolModels/programModel");
+const specializationModel = require("../../database/models/SchoolModels/specializationModel");
 const validateData = require("../../util/dataValidator");
 const AppError = require("../../util/ErrorHandler");
 const mongoose = require("mongoose");
@@ -165,4 +167,114 @@ exports.getAllProgramData = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+};
+
+
+exports.updateProgramSpecialization = async (req, res, next) => {
+  try {
+    const { session, school, department, program , existingSpec, newSpec } = req.body;
+
+    // Step 1: Validate session, school, and department IDs
+    if (!isValidObjectId(session) || !isValidObjectId(school) || !isValidObjectId(department)|| !isValidObjectId(program)) {
+      throw new AppError("Invalid ID formats for session, school, or department", 400);
+    }
+
+    const programData= await programModel.findById(program);
+
+    if (!programData) {
+      throw new AppError("Program not found", 404);
+    }
+    
+    // Step 2: Validate uniqueness of program names and codes
+    const allSpecs = [...existingSpec, ...newSpec];
+    const nameSet = new Set();
+    const codeSet = new Set();
+
+    for (const sp of allSpecs) {
+      const normalizedName = sp.name.trim().toUpperCase();
+      const normalizedCode = sp.code.trim().toUpperCase();
+
+      if (nameSet.has(normalizedName)) {
+        throw new AppError(`Duplicate Specialization name found: ${sp.name}`, 400);
+      }
+      if (codeSet.has(normalizedCode)) {
+        throw new AppError(`Duplicate Specialization code found: ${sp.code}`, 400);
+      }
+
+      nameSet.add(normalizedName);
+      codeSet.add(normalizedCode);
+    }
+    
+    // Step 3: Update existing programs
+    for (const spec of existingSpec) {
+      if (!isValidObjectId(spec.id)) {
+        throw new AppError(`Invalid program ID: ${spec.id}`, 400);
+      }
+
+      await specializationModel.findByIdAndUpdate(
+        spec.id,
+        {
+          name: spec.name,
+          code: spec.code,
+          degreeType: spec.type,
+          duration: spec.duration,
+          description: spec.des || "",
+          deleted: spec.deleted || false,
+          deletedAt: spec.deleted ? new Date() : null,
+          
+        },
+        { new: true, runValidators: true }
+      );
+    }
+    
+    // Step 4: Create new Specialization
+    const newSpecPromises = newSpec.map((spec) =>
+      specializationModel.create({
+        name: spec.name,
+        code: spec.code,
+        degreeType: spec.type,
+        duration: spec.duration,
+        description: spec.des || "",
+        program,
+        session,
+        deleted: false,
+      })
+    );
+
+    const createdSpecs = await Promise.all(newSpecPromises);
+    
+    // Step 5: Update department with new program IDs
+    const newSpecIds = createdSpecs.map((sp) => sp._id);
+    
+    programData.specializations = [...programData.specializations, ...newSpecIds];
+    await programData.save();
+
+    // Step 6: Fetch updated programs
+    const updatedProgram = await programModel.findById(program).populate("specializations");
+    
+    const sessions = await sessionModel
+            .find()
+            .populate({
+              path: 'schools',
+              populate: {
+                path: 'departments',
+                populate: {
+                  path: 'programs',
+                  populate: {
+                    path: 'specializations',
+                  },
+                },
+              },
+            });
+    res.status(200).json({
+      success: true,
+      message: "Prgram Specialization updated successfully",
+      data: {
+        specs:updatedProgram.specializations,
+        sessions:sessions
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
 };

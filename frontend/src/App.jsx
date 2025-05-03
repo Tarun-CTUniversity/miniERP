@@ -5,8 +5,8 @@ import './App.css'
 import CreateSession from './pages/SessionManagementPages/SessionPages/CreateSession'
 import AdminManageSession from "./SessionManagement/AdminManageSession"
 import AddSchoolInfo from './pages/SessionManagementPages/SchoolPages/AddSchoolInfo'
-
-
+import AddDepartmentInfo from './pages/SessionManagementPages/DepartmentPages/AddDepartmentInfo'
+import AddProgramInfo from './pages/SessionManagementPages/ProgramPages/AddProgramInfo'
 
 function App() {
   const [userType, setUserType] = useState("Student");
@@ -17,8 +17,11 @@ function App() {
   // return AdminManageSession()
 
   return(
-      <AddSchoolInfo/>
+      <AddProgramInfo />
+      //  <AddDepartmentInfo />
+      // <AddSchoolInfo/>
       // <CreateSession />
+      // <DeleteSchoolsFromSession />
   )
   
   const [info , setInfo] = useState({});

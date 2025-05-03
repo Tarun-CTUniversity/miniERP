@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 /**
- * CancelButton is a reusable button component that dynamically changes background
+ * DeleteButton is a reusable button component that dynamically changes background
  * color based on different states (normal, focus, click). It supports both desktop
  * (mouse events) and mobile (touch events) interactions.
  * 
@@ -9,14 +9,16 @@ import React, { useState } from "react";
  * @param {string} fontsize - The font size for the button text (default is "16px").
  * @param {string} px - Horizontal padding (default is "16px").
  * @param {string} py - Vertical padding (default is "8px").
- * @returns {JSX.Element} A styled cancel button.
+ * @param {boolean} disabled - Whether the button is disabled.
+ * 
+ * @returns {JSX.Element} A styled delete button.
  */
-const CancelButton = ({ handleClick, fontsize = "16px", px = "16px", py = "8px" , disabled = false}) => {
+const DeleteButton = ({ handleClick, fontsize = "16px", px = "16px", py = "8px", disabled = false }) => {
   const [clicked, setClicked] = useState(false);
 
   const handlePress = () => setClicked(true);
   const handleRelease = () => {
-    if (clicked) {
+    if (clicked && !disabled) {
       handleClick();
       setClicked(false);
     }
@@ -25,7 +27,8 @@ const CancelButton = ({ handleClick, fontsize = "16px", px = "16px", py = "8px" 
   return (
     <button
       className={`text-white rounded-lg transition-all 
-        ${clicked ? "bg-yellow-700" : "bg-yellow-500 hover:bg-yellow-600 focus:bg-yellow-600"}
+        ${clicked ? "bg-red-700" : "bg-red-500 hover:bg-red-600 focus:bg-red-600"}
+        ${disabled ? "opacity-50 cursor-not-allowed" : ""}
       `}
       style={{ fontSize: fontsize, padding: `${py} ${px}` }}
       onMouseDown={handlePress}
@@ -33,11 +36,11 @@ const CancelButton = ({ handleClick, fontsize = "16px", px = "16px", py = "8px" 
       onMouseLeave={() => setClicked(false)}
       onTouchStart={handlePress}
       onTouchEnd={handleRelease}
-      disabled = {disabled}
+      disabled={disabled}
     >
-      Cancel
+      Delete
     </button>
   );
 };
 
-export default CancelButton;
+export default DeleteButton;

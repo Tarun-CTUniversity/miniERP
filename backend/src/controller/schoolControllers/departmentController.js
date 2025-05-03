@@ -1,8 +1,12 @@
 const mongoose = require("mongoose");
 const departmentModel = require("../../database/models/SchoolModels/departmentModel");
 const schoolModel = require("../../database/models/SchoolModels/schoolModel");
+const programModel = require("../../database/models/SchoolModels/programModel");
 const AppError = require("../../util/ErrorHandler");
 const validateData = require("../../util/dataValidator");
+const Specialization = require("../../database/models/SchoolModels/specializationModel");
+const sessionModel = require("../../database/models/AcadmicModel/sessionModel");
+const PROGRAM_TYPE = ['Bachelor', 'Master', 'PhD', 'Diploma', 'Certificate'];
 
 // Helper function to validate ObjectId
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
@@ -174,4 +178,114 @@ exports.getAllDepartmentData = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+};
+
+exports.updateDepartmentPrograms = async (req, res, next) => {
+  try {
+    const { session, school, department, existingPrograms, newPrograms } = req.body;
+    
+
+    // Step 1: Validate session, school, and department IDs
+    if (!isValidObjectId(session) || !isValidObjectId(school) || !isValidObjectId(department)) {
+      throw new AppError("Invalid ID formats for session, school, or department", 400);
+    }
+
+    const departmentData = await departmentModel.findById(department);
+
+    if (!departmentData) {
+      throw new AppError("Department not found", 404);
+    }
+    
+    // Step 2: Validate uniqueness of program names and codes
+    const allPrograms = [...existingPrograms, ...newPrograms];
+    const nameSet = new Set();
+    const codeSet = new Set();
+
+    for (const program of allPrograms) {
+      const normalizedName = program.name.trim().toUpperCase();
+      const normalizedCode = program.code.trim().toUpperCase();
+
+      if (nameSet.has(normalizedName)) {
+        throw new AppError(`Duplicate program name found: ${program.name}`, 400);
+      }
+      if (codeSet.has(normalizedCode)) {
+        throw new AppError(`Duplicate program code found: ${program.code}`, 400);
+      }
+
+      nameSet.add(normalizedName);
+      codeSet.add(normalizedCode);
+    }
+    
+    // Step 3: Update existing programs
+    for (const program of existingPrograms) {
+      if (!isValidObjectId(program.id)) {
+        throw new AppError(`Invalid program ID: ${program.id}`, 400);
+      }
+
+      await programModel.findByIdAndUpdate(
+        program.id,
+        {
+          name: program.name,
+          code: program.code,
+          degreeType: program.type,
+          duration: program.duration,
+          description: program.des || "",
+          deleted: program.deleted || false,
+          deletedAt: program.deleted ? new Date() : null,
+          
+        },
+        { new: true, runValidators: true }
+      );
+    }
+    
+    // Step 4: Create new programs
+    const newProgramPromises = newPrograms.map((program) =>
+      programModel.create({
+        name: program.name,
+        code: program.code,
+        degreeType: program.type,
+        duration: program.duration,
+        description: program.des || "",
+        department,
+        session,
+        deleted: false,
+      })
+    );
+   
+    const createdPrograms = await Promise.all(newProgramPromises);
+    
+    // Step 5: Update department with new program IDs
+    const newProgramIds = createdPrograms.map((program) => program._id);
+    
+    departmentData.programs = [...departmentData.programs, ...newProgramIds];
+    await departmentData.save();
+
+    // Step 6: Fetch updated programs
+    const updatedDepartment = await departmentModel.findById(department).populate("programs");
+    
+    const sessions = await sessionModel
+            .find()
+            .populate({
+              path: 'schools',
+              populate: {
+                path: 'departments',
+                populate: {
+                  path: 'programs',
+                  populate: {
+                    path: 'specializations',
+                  },
+                },
+              },
+            });
+    res.status(200).json({
+      success: true,
+      message: "Department programs updated successfully",
+      data: {
+        programs:updatedDepartment.programs,
+        sessions:sessions
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
 };

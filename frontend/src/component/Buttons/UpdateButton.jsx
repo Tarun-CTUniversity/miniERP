@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 /**
- * CancelButton is a reusable button component that dynamically changes background
+ * UpdateButton is a reusable button component that dynamically changes background
  * color based on different states (normal, focus, click). It supports both desktop
  * (mouse events) and mobile (touch events) interactions.
  * 
@@ -9,9 +9,9 @@ import React, { useState } from "react";
  * @param {string} fontsize - The font size for the button text (default is "16px").
  * @param {string} px - Horizontal padding (default is "16px").
  * @param {string} py - Vertical padding (default is "8px").
- * @returns {JSX.Element} A styled cancel button.
+ * @returns {JSX.Element} A styled update button.
  */
-const CancelButton = ({ handleClick, fontsize = "16px", px = "16px", py = "8px" , disabled = false}) => {
+const UpdateButton = ({ handleClick, fontsize = "16px", px = "16px", py = "8px", disabled = false }) => {
   const [clicked, setClicked] = useState(false);
 
   const handlePress = () => setClicked(true);
@@ -25,7 +25,7 @@ const CancelButton = ({ handleClick, fontsize = "16px", px = "16px", py = "8px" 
   return (
     <button
       className={`text-white rounded-lg transition-all 
-        ${clicked ? "bg-yellow-700" : "bg-yellow-500 hover:bg-yellow-600 focus:bg-yellow-600"}
+        ${clicked ? "bg-blue-800" : "bg-blue-600 hover:bg-blue-700 focus:bg-blue-700"}
       `}
       style={{ fontSize: fontsize, padding: `${py} ${px}` }}
       onMouseDown={handlePress}
@@ -33,11 +33,11 @@ const CancelButton = ({ handleClick, fontsize = "16px", px = "16px", py = "8px" 
       onMouseLeave={() => setClicked(false)}
       onTouchStart={handlePress}
       onTouchEnd={handleRelease}
-      disabled = {disabled}
+      disabled={disabled}
     >
-      Cancel
+      Update
     </button>
   );
 };
 
-export default CancelButton;
+export default UpdateButton;

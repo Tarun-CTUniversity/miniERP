@@ -4,39 +4,39 @@ import { MdDeleteForever } from "react-icons/md";
 import { FaTrashRestore } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
 
-const DepartmentCardForSchool = ({
-  department: initialDepartment,
+const SpecializationCard = ({
+  specialization: initialSpecialization,
   onDelete,
   onUpdate,
   valid,
   disabled = false,
   mode = 'active', // 'add', 'active', 'deleted'
 }) => {
-  // Department of the form:
+  // Specialization of the form:
   // { name: "", code: "", des: "" }
 
-  const [department, setDepartment] = useState(initialDepartment);
+  const [specialization, setSpecialization] = useState(initialSpecialization);
 
   useEffect(() => {
-    onUpdate && onUpdate(department);
-  }, [department]);
+    onUpdate && onUpdate(specialization);
+  }, [specialization]);
 
   const handleNameChange = (name,value) => {
-    setDepartment((prev) => ({
+    setSpecialization((prev) => ({
       ...prev,
       name: value,
     }));
   };
 
   const handleCodeChange = (name,value) => {
-    setDepartment((prev) => ({
+    setSpecialization((prev) => ({
       ...prev,
       code: value.toUpperCase(),
     }));
   };
 
   const handleDescriptionChange = (e) => {
-    setDepartment((prev) => ({
+    setSpecialization((prev) => ({
       ...prev,
       des: e.target.value,
     }));
@@ -76,8 +76,8 @@ const DepartmentCardForSchool = ({
         <CustomInput
           name="Name"
           type="text"
-          placeholder="Enter Department Name"
-          data={department.name}
+          placeholder="Enter Specialization Name"
+          data={specialization.name}
           handleChange={handleNameChange}
           textsize="16px"
           input_width="50%"
@@ -88,8 +88,8 @@ const DepartmentCardForSchool = ({
         <CustomInput
           name="Code"
           type="text"
-          placeholder="Department Code"
-          data={department.code}
+          placeholder="Specialization Code"
+          data={specialization.code}
           handleChange={handleCodeChange}
           textsize="16px"
           input_width="25%"
@@ -102,7 +102,7 @@ const DepartmentCardForSchool = ({
       <div>
         <textarea
           placeholder="Enter Description"
-          value={department.des}
+          value={specialization.des}
           onChange={handleDescriptionChange}
           className="w-full p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
           style={{ fontSize: '12px', height: '80px' }}
@@ -113,4 +113,4 @@ const DepartmentCardForSchool = ({
   );
 };
 
-export default DepartmentCardForSchool;
+export default SpecializationCard;
