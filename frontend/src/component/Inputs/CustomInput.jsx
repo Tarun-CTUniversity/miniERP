@@ -64,12 +64,17 @@ const CustomInput = ({
     return `${baseStyle} border-black cursor-text`; // Default style if no condition applies
   }, [value, valid, clicked, disabled]);
 
+  function capitalizeFirstLetter(str) {
+    if (!str) return ''; // Handle empty or null strings
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
   return (
     <div className="gap-y-[5px] flex flex-col" style={{width:input_width}} onClick={()=>console.log(valid)}>
 
       {/* Input label with a red asterisk for required fields */}
       <p className="ml-[1%]">
-        {name} {required && <span style={{ color: "red" }}> * </span>}
+        {capitalizeFirstLetter(name)} {required && <span style={{ color: "red" }}> * </span>}
       </p>
 
       {/* The input field */}

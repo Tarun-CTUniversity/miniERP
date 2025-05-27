@@ -3,10 +3,12 @@ import CreateSessionPage from './admin/BasicPages/sessionPage/CreateSessionPage'
 import LeftNavBar from './admin/navigationbar/LeftNavBar'
 import './App.css'
 import CreateSession from './pages/SessionManagementPages/SessionPages/CreateSession'
-import AdminManageSession from "./SessionManagement/AdminManageSession"
 import AddSchoolInfo from './pages/SessionManagementPages/SchoolPages/AddSchoolInfo'
 import AddDepartmentInfo from './pages/SessionManagementPages/DepartmentPages/AddDepartmentInfo'
 import AddProgramInfo from './pages/SessionManagementPages/ProgramPages/AddProgramInfo'
+import AddClasses from './pages/SessionManagementPages/classPages/AddClasses'
+
+import ClassCard from './pages/SessionManagementPages/classPages/ClassCard'
 
 function App() {
   const [userType, setUserType] = useState("Student");
@@ -14,14 +16,21 @@ function App() {
     console.log("data")
   }
 
-  // return AdminManageSession()
-
   return(
+    <div>
+      {/* <ClassCard /> */}
+       <CreateSession />
+      <AddSchoolInfo/>
+      <AddDepartmentInfo />
       <AddProgramInfo />
-      //  <AddDepartmentInfo />
-      // <AddSchoolInfo/>
-      // <CreateSession />
-      // <DeleteSchoolsFromSession />
+      {/* <AddClasses /> */}
+      
+      
+      
+     
+    </div>
+     
+      
   )
   
   const [info , setInfo] = useState({});

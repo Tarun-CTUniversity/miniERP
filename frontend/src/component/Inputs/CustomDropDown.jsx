@@ -10,7 +10,7 @@ import React, { useState, useMemo } from "react";
  * @param {string} placeholder - Placeholder text for the dropdown (optional).
  * @param {boolean} required - Indicates whether the dropdown is required or not (default is true).
  * @param {boolean} disabled - Indicates whether the dropdown is disabled (default is false).
- * @param {string} textsiz - The font size for the dropdown text (default is "16px").
+ * @param {string} textsize - The font size for the dropdown text (default is "16px").
  * @param {object} valid - An object that holds validation errors for each input field.
  * 
  * @returns {JSX.Element} A custom dropdown element with dynamic styling and validation.
@@ -43,11 +43,16 @@ const CustomDropDown = ({
     return `${baseStyle} border-black cursor-pointer`; // Default style if no condition applies
   }, [selectedValue, valid, clicked, disabled]);
 
+  function capitalizeFirstLetter(str) {
+    if (!str) return ''; // Handle empty or null strings
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
   return (
     <div className="w-[200px] gap-y-[5px] flex flex-col">
       {/* Dropdown label with a red asterisk for required fields */}
       <p className="ml-[1%]">
-        {name} {required && <span style={{ color: "red" }}> * </span>}
+        {capitalizeFirstLetter(name)} {required && <span style={{ color: "red" }}> * </span>}
       </p>
 
       {/* The dropdown (select) field */}
