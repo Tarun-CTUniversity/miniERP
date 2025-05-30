@@ -251,6 +251,7 @@ const CreateSession = () => {
         // The server responded with a status code outside the 2xx range
         const errorMessage = error.response.data.message || "Failed to fetch session data";
         if(errorMessage === "Session not found"){
+          setExistingSchools([]);
           setQueryType("create");
           return;
         } 

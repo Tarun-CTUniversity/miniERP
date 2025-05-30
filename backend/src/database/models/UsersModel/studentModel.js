@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-// ---------- Student Main Schema ----------
+// ---------- Student Schema ----------
 const studentSchema = new mongoose.Schema({
 
   // --- Personal Info ---
   name: { type: String, required: true, trim: true },
-  UID:{type: String, required: true, trim: true},
+  UID: { type: String, required: true, trim: true, unique: true },
   dateOfBirth: { type: Date, required: true },
   gender: { type: String, enum: ["male", "female", "other"], required: true },
   aadhar: { type: String, trim: true },
@@ -15,13 +15,31 @@ const studentSchema = new mongoose.Schema({
   // --- Parental Info ---
   fatherName: { type: String, required: true, trim: true },
   motherName: { type: String, required: true, trim: true },
-  fatherMobile: { type: String, required: true, trim: true },
-  motherMobile: { type: String, trim: true },
-  parentEmail: { type: String, trim: true },
+  fatherMobile: {
+    countryCode: { type: String, required: true }, // e.g., "+91"
+    number: { type: String, required: true, trim: true }
+  },
+  motherMobile: {
+    countryCode: { type: String },
+    number: { type: String, trim: true }
+  },
+  parentEmail: {
+    type: String,
+    trim: true,
+    match: [/^\S+@\S+\.\S+$/, "Invalid parent email format"]
+  },
 
   // --- Contact Info ---
-  studentMobile: { type: String, required: true, trim: true },
-  studentEmail: { type: String, required: true, trim: true },
+  studentMobile: {
+    countryCode: { type: String, required: true },
+    number: { type: String, required: true, trim: true }
+  },
+  studentEmail: {
+    type: String,
+    required: true,
+    trim: true,
+    match: [/^\S+@\S+\.\S+$/, "Invalid student email format"]
+  },
 
   // --- Address Info ---
   localAddress: { type: String, required: true },
@@ -37,17 +55,14 @@ const studentSchema = new mongoose.Schema({
   entryType: { type: String, enum: ["regular", "lateral", "transfer"], default: "regular" },
   admissionCategory: { type: String, enum: ["PMS", "NON PMS"], required: true },
 
+  // --Session Info
+  sessions: [{ type: mongoose.Schema.Types.ObjectId, ref: "StudentSession" }],
 
+  // --- Results ---
   results: [
     {
-      session: {
-        type: String, // e.g., "2024-25"
-        required: true
-      },
-      result: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "StudentResult"
-      }
+      session: { type: String, required: true }, // e.g., "2024-25"
+      result: { type: mongoose.Schema.Types.ObjectId, ref: "StudentResult" }
     }
   ],
 
@@ -59,23 +74,37 @@ const studentSchema = new mongoose.Schema({
   },
   usesUniversityBus: { type: Boolean, default: false },
 
+  // --- Profile Image (local path) ---
+  profileImage: { type: String, trim: true }, // e.g., /uploads/students/photo123.jpg
+
   // --- Authentication ---
   password: { type: String, required: true, select: false },
 
-  // --- Other Info ---
-  deleted: { type: Boolean, default: false }, // soft delete flag
-}, {
-  timestamps: true
+  // --- Soft Delete ---
+  deleted: { type: Boolean, default: false }
+
+}, { timestamps: true });
+
+
+// ---------- Virtual Field: Age ----------
+studentSchema.virtual("age").get(function () {
+  if (!this.dateOfBirth) return null;
+  const ageDiffMs = Date.now() - this.dateOfBirth.getTime();
+  return Math.floor(ageDiffMs / (1000 * 60 * 60 * 24 * 365.25));
 });
 
-// ---------- Password Hashing ----------
+// Enable virtuals in JSON and Object outputs
+studentSchema.set("toJSON", { virtuals: true });
+studentSchema.set("toObject", { virtuals: true });
+
+// ---------- Password Hashing Before Save ----------
 studentSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-// ---------- Password Compare ----------
+// ---------- Compare Password ----------
 studentSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };

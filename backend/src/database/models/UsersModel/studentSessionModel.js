@@ -11,7 +11,7 @@ const studentSessionSchema = new mongoose.Schema({
   specialization: { type: mongoose.Schema.Types.ObjectId, ref: "Specialization" },
 
   // Class & Subject Info
-  class: { type: mongoose.Schema.Types.ObjectId, ref: "Class" },
+  class: { type: mongoose.Schema.Types.ObjectId, ref: "ClassSection" },
   section: { type: String },
   group: { type: String },
   subjects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subject" }],
@@ -19,5 +19,7 @@ const studentSessionSchema = new mongoose.Schema({
   mentor:{type: mongoose.Schema.Types.ObjectId, ref: "Teacher"}
 
 }, { timestamps: true });
+
+studentSessionSchema.index({ student: 1, session: 1 }, { unique: true });
 
 module.exports = mongoose.model("StudentSession", studentSessionSchema);
