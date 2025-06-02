@@ -8,11 +8,6 @@ const SpecializationSchema = new Schema({
       unique: true,
       trim: [true,"Give the name of Specialization"]
     },
-    program:{
-      type: Schema.Types.ObjectId,
-      ref: 'Programme',
-      required: [true , "Give the program name"]
-    },
     code:{
       type:String,
       required: [true , "Give the Specialization Code"]

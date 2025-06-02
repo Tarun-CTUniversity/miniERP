@@ -132,6 +132,7 @@ export default function ProgramCard({
               options={PROGRAM_TYPE}
               handleChange={handleTypeChange}
               valid={valid?.type}
+              initialValue = {program.type}
             />
 
             <CustomInput
@@ -150,7 +151,7 @@ export default function ProgramCard({
           {/* Description */}
           <div>
             <textarea
-              placeholder="Enter Description"
+              placeholder="Enter Description ( Write Full Name of Program as per School Guidance)"
               value={program.des}
               onChange={handleDescriptionChange}
               className="w-full p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"

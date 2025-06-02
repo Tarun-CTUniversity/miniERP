@@ -10,11 +10,10 @@ import CustomDropDown from '../../../component/Inputs/CustomDropDown';
 import CancelButton from '../../../component/Buttons/CancelButton';
 import CreateButton from '../../../component/Buttons/CreateButton';
 import SchoolCardForSession from './SchoolCardForSession';
-import axios from 'axios';
-import { HOST } from '../../../constants/Constants';
 import { v4 as uuidv4 } from 'uuid';
 import UpdateButton from '../../../component/Buttons/UpdateButton';
-
+import api from '../../../api/api';
+import { useApi } from '../../../hooks/useApi';
 
 const CreateSession = () => {
   const SESSION_OPTIONS = ["Jan-June", "Sep-Dec"];
@@ -24,6 +23,7 @@ const CreateSession = () => {
   const [valid, setValid] = useState({ year: '', session: '' , addedSchools : [] , existingSchools : []});
   const [addedSchools, setAddedSchools] = useState([]);
   const [existingSchools, setExistingSchools] = useState([]);
+  const { request, loading, error } = useApi();
 
 
   const validateSchoolData = () => {
@@ -94,7 +94,7 @@ const CreateSession = () => {
     }
     
     try {
-      const response = await axios.post(`${HOST}/api/v1/basicInfo/session`, {
+      const response = await request(api.createSession, {
         name: year + "," + session,
         schools: addedSchools
       });
@@ -134,7 +134,7 @@ const CreateSession = () => {
     }
     
     try {
-      const response = await axios.put(`${HOST}/api/v1/basicInfo/session`, {
+      const response = await request(api.updateSession, {
         name: year + "," + session,
         existingSchools: existingSchools,
         addedSchools: addedSchools
@@ -235,7 +235,7 @@ const CreateSession = () => {
   // get data of all the schools if session already exists
   const getSessionData = async (sessionName) => {
     try {
-      const response = await axios.get(`${HOST}/api/v1/basicInfo/session/getSessionByName/${sessionName}`);
+      const response = await request(api.getSessionByName,sessionName);
       if(response.data.data){
         const schoolData = response.data.data.schools.map((school) => ({ id: school._id, name: school.name, code: school.code, des: school.description,deleted:school.deleted }));
         setExistingSchools(schoolData);

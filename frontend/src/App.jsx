@@ -9,6 +9,7 @@ import AddProgramInfo from './pages/SessionManagementPages/ProgramPages/AddProgr
 import AddClasses from './pages/SessionManagementPages/classPages/AddClasses'
 
 import ClassCard from './pages/SessionManagementPages/classPages/ClassCard'
+import AddSpecialization from './pages/SessionManagementPages/ProgramPages/AddSpecialization'
 
 function App() {
   const [userType, setUserType] = useState("Student");
@@ -19,11 +20,12 @@ function App() {
   return(
     <div>
       {/* <ClassCard /> */}
-       <CreateSession />
+       {/* <CreateSession />
       <AddSchoolInfo/>
       <AddDepartmentInfo />
-      <AddProgramInfo />
-      {/* <AddClasses /> */}
+      <AddProgramInfo /> */}
+      <AddSpecialization />
+      
       
       
       

@@ -3,9 +3,9 @@ import CustomDropDown from "../../../component/Inputs/CustomDropDown";
 import CancelButton from "../../../component/Buttons/CancelButton";
 import UpdateButton from "../../../component/Buttons/UpdateButton";
 import ProgramCard from "./ProgramCard";
-import axios from "axios";
-import { HOST } from "../../../constants/Constants";
 import { v4 as uuidv4 } from "uuid";
+import api from "../../../api/api";
+import { useApi } from '../../../hooks/useApi';
 
 const PROGRAM_TYPE = ['Bachelor', 'Master', 'PhD', 'Diploma', 'Certificate'];
 
@@ -15,6 +15,8 @@ export default function AddDepartmentInfo() {
   const [session, setSession] = useState([]);
   const [school, setSchool] = useState([]);
   const [department, setDepartment] = useState([]);
+  const { request, loading, error } = useApi();
+
 
   const [valid, setValid] = useState({
     session: "",
@@ -33,7 +35,7 @@ export default function AddDepartmentInfo() {
 
   const getSessionData = async () => {
     try {
-      const resp = await axios.get(`${HOST}/api/v1/basicInfo/session/getSessionsData`);
+      const resp = await request(api.getSessionData);
       if (resp.status === 200 && resp.data?.data) {
         const val = resp.data.data;
         setSessionData(val);
@@ -282,7 +284,7 @@ const handleUpdateData = async () => {
   };
 
   try {
-    const response = await axios.put(`${HOST}/api/v1/basicInfo/department/updatePrograms`, data);
+    const response = await request(api.updatePrograms, data);
 
     if (response.status === 200 && response.data?.data) {
       alert("Programs updated successfully");

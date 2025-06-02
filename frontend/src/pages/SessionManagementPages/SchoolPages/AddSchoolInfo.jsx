@@ -3,14 +3,15 @@ import CustomDropDown from "../../../component/Inputs/CustomDropDown";
 import CancelButton from "../../../component/Buttons/CancelButton";
 import UpdateButton from "../../../component/Buttons/UpdateButton";
 import DepartmentCardForSchool from "./DepartmentCardForSchool";
-import axios from "axios";
-import { HOST } from "../../../constants/Constants";
 import { v4 as uuidv4 } from 'uuid';
+import api from '../../../api/api';
+import { useApi } from '../../../hooks/useApi';
 
 const AddSchoolInfo = () => {
   const [sessionData, setSessionData] = useState({ SESSION: [], SCHOOLS: [] });
   const [session, setSession] = useState("");
   const [school, setSchool] = useState("");
+  const { request, loading, error } = useApi();
 
   const [valid, setValid] = useState({
     school: "",
@@ -27,21 +28,22 @@ const AddSchoolInfo = () => {
   }, []);
 
   const getSessionNames = async () => {
-    try {
-      const resp = await axios.get(`${HOST}/api/v1/basicInfo/session/getSessionNames`);
-      setSessionData((prev) => ({
-        ...prev,
-        SESSION: resp.data.data.map((data) => data.name),
-      }));
-    } catch (err) {
-      alert("Server Not working Properly");
-      console.error(err);
-    }
-  };
+  try {
+    const resp = await request(api.getSessionNames);
+    console.log(resp);
+    setSessionData((prev) => ({
+      ...prev,
+      SESSION: resp.data.data.map((item) => item.name),
+    }));
+  } catch (err) {
+    alert("Server Not working Properly");
+    console.error(err);
+  }
+};
 
   const getSchoolNames = async (name) => {
     try {
-      const resp = await axios.get(`${HOST}/api/v1/basicInfo/session/getSessionByName/${name}`);
+      const resp = await request(api.getSessionByName,name);
       setSessionData((prev) => ({
         ...prev,
         SCHOOLS: resp.data.data.schools.map((school) => school.name),
@@ -55,9 +57,7 @@ const AddSchoolInfo = () => {
   const getDepartments = async (department) => {
     const schoolInfo = `${session}_${department}`;
     try {
-      const response = await axios.get(
-        `${HOST}/api/v1/basicInfo/school/getAllDepartment/${schoolInfo}`
-      );
+      const response = await request(api.getAllDepartmentsBySchool,schoolInfo);
       if (response.status === 200 && response.data?.data) {
         const fetched = response.data.data;
         setExistingDepartments(fetched.map((dept) => ({ name : dept.name, code : dept.code, id : dept._id  , deleted : dept.deleted })));
@@ -216,7 +216,7 @@ const AddSchoolInfo = () => {
     };
 
     try {
-      const response = await axios.put(`${HOST}/api/v1/basicInfo/school/updateSchoolDepartments`, data);
+      const response = await request(api.updateSchoolDepartment,data);
       if (response.status === 200) {
         alert("Data Updated Successfully");
         if(response.data.data){
