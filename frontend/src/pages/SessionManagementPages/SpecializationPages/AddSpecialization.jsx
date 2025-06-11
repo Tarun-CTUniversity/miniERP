@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import CustomDropDown from "../../../component/Inputs/CustomDropDown";
 import CancelButton from "../../../component/Buttons/CancelButton";
 import UpdateButton from "../../../component/Buttons/UpdateButton";
-import axios from "axios";
-import { HOST } from "../../../constants/Constants";
 import { v4 as uuidv4 } from "uuid";
 import api from "../../../api/api";
 import { useApi } from "../../../hooks/useApi";
@@ -249,9 +247,10 @@ const handleUpdateData = async () => {
       alert("Specialization updated successfully");
 
       const fetched = response.data.data;
+      console.log(fetched);
       // Map the fetched specializations to update the state
       setExistingSpec(
-        fetched.specs.map((spec) => ({
+        fetched.map((spec) => ({
           name: spec.name,
           code: spec.code,
           id: spec._id,
@@ -264,7 +263,7 @@ const handleUpdateData = async () => {
       setValid((prev) => ({
         ...prev,
         newSpec: [],
-        existingSpec: fetched.specs.map(() => ({
+        existingSpec: fetched.map(() => ({
           name: "",
           code: "",
           duration: "",

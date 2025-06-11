@@ -50,8 +50,8 @@ const teacherSchema = new mongoose.Schema({
   pincode: { type: String },
 
   // --- Employment Info ---
-  teacherID: { type: String, required: true, unique: true },
-  qualification: { type: String, trim: true, required: true },
+  userID: { type: String, required: true, unique: true },
+  qualification: { type: String, trim: true},
   joiningDate: { type: Date },
 
   // --- Role Info ---
@@ -62,7 +62,7 @@ const teacherSchema = new mongoose.Schema({
   },
 
   // --- Authentication ---
-  password: { type: String, required: true, select: false },
+  password: { type: String, required: true, select: false ,minLength:6},
 
   // --- Status Info ---
   deleted: { type: Boolean, default: false },
@@ -95,7 +95,7 @@ teacherSchema.methods.comparePassword = async function (password) {
 // ---------- Generate JWT Token ----------
 teacherSchema.methods.generateAuthToken = function () {
   return jwt.sign(
-    { id: this._id, role: this.roles },
+    { id: this._id, role: this.roles, userType: "teacher" },
     process.env.SECRET_KEY,
     { expiresIn: process.env.TOKEN_EXPIRY }
   );

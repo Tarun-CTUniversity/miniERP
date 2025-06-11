@@ -378,14 +378,12 @@ exports.updateSessionSpecializations = async (req, res, next) => {
     await sessionDoc.save();
 
     // Step 6: Fetch and return updated specializations under this session
-    const updatedSpecs = await specializationModel.find({ sessionID });
+    const updatedSpecs = await specializationModel.find({"session" : sessionID})
 
     res.status(200).json({
       success: true,
       message: "Specializations updated successfully",
-      data: {
-        specs: updatedSpecs,
-      },
+      data: updatedSpecs,
     });
   } catch (err) {
     next(err);

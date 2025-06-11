@@ -6,7 +6,7 @@ const studentSchema = new mongoose.Schema({
 
   // --- Personal Info ---
   name: { type: String, required: true, trim: true },
-  UID: { type: String, required: true, trim: true, unique: true },
+  userID: { type: String, required: true, trim: true, unique: true },
   dateOfBirth: { type: Date, required: true },
   gender: { type: String, enum: ["male", "female", "other"], required: true },
   aadhar: { type: String, trim: true },
@@ -77,8 +77,15 @@ const studentSchema = new mongoose.Schema({
   // --- Profile Image (local path) ---
   profileImage: { type: String, trim: true }, // e.g., /uploads/students/photo123.jpg
 
+  // --- Role Info ---
+  roles: {
+    type: [String],
+    enum: ["student", "CR"],
+    default: ["student"]
+  },
+
   // --- Authentication ---
-  password: { type: String, required: true, select: false },
+  password: { type: String, required: true, select: false,minLength:6 },
 
   // --- Soft Delete ---
   deleted: { type: Boolean, default: false }
@@ -108,5 +115,14 @@ studentSchema.pre("save", async function (next) {
 studentSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
+
+studentSchema.methods.generateAuthToken = function () {
+  return jwt.sign(
+    { id: this._id, role: this.roles, userType: "student" },
+    process.env.SECRET_KEY,
+    { expiresIn: process.env.TOKEN_EXPIRY }
+  );
+};
+
 
 module.exports = mongoose.model("Student", studentSchema);

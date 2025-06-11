@@ -26,7 +26,8 @@ const CustomInput = ({
   disabled = false,
   textsize = "16px",
   input_width = "200px",
-  valid
+  valid,
+  
 }) => {
 
   // Local state to manage the value of the input field.
@@ -65,9 +66,13 @@ const CustomInput = ({
   }, [value, valid, clicked, disabled]);
 
   function capitalizeFirstLetter(str) {
-    if (!str) return ''; // Handle empty or null strings
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-  }
+  if (!str) return ''; // Handle empty or null strings
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
 
   return (
     <div className="gap-y-[5px] flex flex-col" style={{width:input_width}} onClick={()=>console.log(valid)}>

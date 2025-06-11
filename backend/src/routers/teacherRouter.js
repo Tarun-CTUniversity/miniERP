@@ -1,13 +1,21 @@
 const express = require("express");
-const { createTeacher, getTeachersAllData } = require("../controller/teacherController");
+const {
+  createTeacher,
+  updateTeacherData,
+  getTeacherProfile,
+  softDeleteTeacher
+} = require("../controller/teacherController");
+
 const { isAuthorized } = require("../util/auth");
 const router = express.Router();
 
 
 
-router.route("/getAllData").get(isAuthorized("superAdmin"),getTeachersAllData);
-
-router.route("/").post(createTeacher);
+// ----------- CRUD Routes -----------
+router.post("/register", createTeacher);      // Sign up with limited fields
+router.put("/update/:userID", updateTeacherData); // Update personal/contact info
+router.get("/profile/:userID", getTeacherProfile); // Get profile by userID
+router.delete("/delete/:userID", softDeleteTeacher); // Soft delete
 
 
 
