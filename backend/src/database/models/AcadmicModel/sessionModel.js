@@ -10,6 +10,10 @@ const sessionSchema = mongo.Schema({
         type:[mongo.Schema.Types.ObjectId],
         ref:"School"
     },
+    specializations:{
+      type:[mongo.Schema.Types.ObjectId],
+      ref:"Specialization"
+    },
     deleted: {
         type: Boolean,
         default: false

@@ -3,6 +3,7 @@ const { createSession, getSessionNames, getSessionDataByName, updateSessionName,
 const { getAllDepartmentOfSchool, updateSchoolDepartments } = require("../controller/schoolControllers/schoolController");
 const { updateDepartmentPrograms } = require("../controller/schoolControllers/departmentController");
 const { updateProgramSpecialization } = require("../controller/schoolControllers/programController");
+const { getSpecializationBySession, updateSessionSpecializations } = require("../controller/schoolControllers/specializationController");
 
 
 const router = express.Router();
@@ -31,7 +32,9 @@ router.route("/department/updatePrograms").put(updateDepartmentPrograms)
 // router.route("/program").post(createProgram).put(updateProgramDescription).get(getAllProgramData);
 // router.route("/program/getProgramNames").get(getAllProgramNames);
 // router.route("/program/:id").get(getAllProgramData);
-router.route("/program/updateSpecialization").put(updateProgramSpecialization)
+router.route("/program/updateSpecialization").put(updateProgramSpecialization);
+router.route("/getAllSpecialization/:sessionID").get(getSpecializationBySession);
+router.route("/specialization").put(updateSessionSpecializations);
 
 // router.route("/subject").post(createSubject);
 

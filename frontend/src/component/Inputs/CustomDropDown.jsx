@@ -23,10 +23,11 @@ const CustomDropDown = ({
   placeholder = "Select...",
   required = true,
   disabled = false,
-  textsize = "16px"
+  textsize = "16px",
+  initialValue = ""
 }) => {
 
-  const [selectedValue, setSelectedValue] = useState("");
+  const [selectedValue, setSelectedValue] = useState(initialValue);
   const baseStyle = "border-2 border-solid rounded-xl text-base w-[90%] py-1 ml-[2%] text-center";
   const [clicked, setClicked] = useState(false);
 

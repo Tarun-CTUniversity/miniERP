@@ -10,10 +10,9 @@ const classSchema = new mongoose.Schema({
 
   // 📚 Academic Structure
   session: { type: mongoose.Schema.Types.ObjectId, ref: "sessionModel", required: true },
-  school: { type: mongoose.Schema.Types.ObjectId, ref: "School", required: true },
-  department: { type: mongoose.Schema.Types.ObjectId, ref: "Department", required: true },
-  program: { type: mongoose.Schema.Types.ObjectId, ref: "Programme", required: true },
-  specialization: [{ type: mongoose.Schema.Types.ObjectId, ref: "Specialization" }],
+  school: [{ type: mongoose.Schema.Types.ObjectId, ref: "School", required: true }],
+  department: [{ type: mongoose.Schema.Types.ObjectId, ref: "Department"}],
+  program: [{ type: mongoose.Schema.Types.ObjectId, ref: "Programme"}],
 
   // 👨‍🏫 Mentor
   mentor: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
@@ -28,7 +27,7 @@ const classSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   deleted: { type: Boolean, default: false },
   deletedAt: { type: Date, default: null }
-
+  
 }, { timestamps: true });
 
 
@@ -44,10 +43,9 @@ classSchema.virtual('subjectCount').get(function () {
 classSchema.set('toJSON', { virtuals: true });
 classSchema.set('toObject', { virtuals: true });
 
-
 // 🔍 Static Methods
 classSchema.statics.findActive = function (filter = {}) {
   return this.find({ deleted: false, ...filter });
 };
 
-module.exports = mongoose.model("Class", classSchema);
+module.exports = mongoose.model("ClassSection", classSchema);

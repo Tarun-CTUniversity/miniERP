@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const specializationModel = require("../../database/models/SchoolModels/specializationModel");
+const sessionModel = require("../../database/models/AcadmicModel/sessionModel");
 const AppError = require("../../util/ErrorHandler");
 
 // Helper function to validate ObjectId
@@ -10,15 +11,11 @@ const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
  */
 exports.createSpecialization = async (req, res, next) => {
     try {
-        const { name, programme, specializationCode, description, session } = req.body;
+        const { name, specializationCode, description, session } = req.body;
 
         // Validate required fields
         if (!name || typeof name !== 'string' || !name.trim()) {
             throw new AppError("Name is required and must be a non-empty string", 400);
-        }
-
-        if (!programme || typeof programme !== 'string' || !programme.trim()) {
-            throw new AppError("Programme ID is required and must be a non-empty string", 400);
         }
 
         if (!specializationCode || typeof specializationCode !== 'string' || !specializationCode.trim()) {
@@ -27,11 +24,6 @@ exports.createSpecialization = async (req, res, next) => {
 
         if (!Array.isArray(session) || session.length === 0 || !session.every(s => typeof s === 'string' && s.trim())) {
             throw new AppError("Session must be a non-empty array of non-empty strings", 400);
-        }
-
-        // Validate Programme ObjectId
-        if (!isValidObjectId(programme)) {
-            throw new AppError("Invalid Programme ID format", 400);
         }
 
         
@@ -47,7 +39,6 @@ exports.createSpecialization = async (req, res, next) => {
         // Create and save the specialization
         const specialization = await specializationModel.create({
             name: name.trim(),
-            programme: programme.trim(),
             specializationCode: specializationCode.trim(),
             description: description ? description.trim() : undefined,
             session: session.map(s => s.trim())
@@ -179,7 +170,7 @@ exports.getSpecializationData = async (req, res, next) => {
             throw new AppError("Invalid Specialization ID format", 400);
         }
 
-        const specialization = await specializationModel.findById(id).populate('programme', 'name');
+        const specialization = await specializationModel.findById(id).populate('name');
         if (!specialization) {
             throw new AppError("Specialization not found", 404);
         }
@@ -199,7 +190,7 @@ exports.getSpecializationData = async (req, res, next) => {
  */
 exports.getAllSpecializationData = async (req, res, next) => {
     try {
-        const specializations = await specializationModel.find().populate('programme', 'name');
+        const specializations = await specializationModel.find().populate('name');
         if (specializations.length === 0) {
             throw new AppError("No specializations found", 404);
         }
@@ -215,7 +206,7 @@ exports.getAllSpecializationData = async (req, res, next) => {
 };
 
 /**
- * 7. Update Specialization (Excluding name, specializationCode, and programme)
+ * 7. Update Specialization (Excluding name, specializationCode,)
  */
 exports.updateSpecialization = async (req, res, next) => {
     try {
@@ -294,4 +285,107 @@ exports.deleteSpecialization = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+};
+
+exports.getSpecializationBySession = async(req,res,next)=>{
+    try{
+        const sessionID = req.params.sessionID;
+
+        const specializations = await sessionModel.findById(sessionID).select("specializations").populate("specializations");
+
+        if(!specializations){
+            throw new AppError("Specializations not found",404);
+        }
+        
+        res.status(200).json({
+            data:specializations,
+            success: true
+        });
+
+    }catch(err){
+        next(err);
+    }
+}
+
+
+exports.updateSessionSpecializations = async (req, res, next) => {
+  try {
+    const { sessionID, existingSpec = [], newSpec = [] } = req.body;
+    console.log(req.body);
+    // Step 1: Validate session ID
+    if (!mongoose.Types.ObjectId.isValid(sessionID)) {
+      throw new AppError("Invalid session ID", 400);
+    }
+
+    const sessionDoc = await sessionModel.findById(sessionID);
+    if (!sessionDoc) {
+      throw new AppError("Session not found", 404);
+    }
+
+    // Step 2: Validate uniqueness of specialization names and codes
+    const allSpecs = [...existingSpec, ...newSpec];
+    const nameSet = new Set();
+    const codeSet = new Set();
+
+    for (const spec of allSpecs) {
+      const normalizedName = spec.name.trim().toUpperCase();
+      const normalizedCode = spec.code.trim().toUpperCase();
+
+      if (nameSet.has(normalizedName)) {
+        throw new AppError(`Duplicate specialization name found: ${spec.name}`, 400);
+      }
+      if (codeSet.has(normalizedCode)) {
+        throw new AppError(`Duplicate specialization code found: ${spec.code}`, 400);
+      }
+
+      nameSet.add(normalizedName);
+      codeSet.add(normalizedCode);
+    }
+
+    // Step 3: Update existing specializations
+    for (const spec of existingSpec) {
+      if (!mongoose.Types.ObjectId.isValid(spec.id)) {
+        throw new AppError(`Invalid specialization ID: ${spec.id}`, 400);
+      }
+
+      await specializationModel.findByIdAndUpdate(
+        spec.id,
+        {
+          name: spec.name,
+          code: spec.code,
+          description: spec.des || "",
+          deleted: spec.deleted || false,
+          deletedAt: spec.deleted ? new Date() : null,
+        },
+        { new: true, runValidators: true }
+      );
+    }
+
+    // Step 4: Create new specializations
+    const newSpecDocs = await specializationModel.insertMany(
+      newSpec.map((spec) => ({
+        name: spec.name,
+        code: spec.code,
+        description: spec.des || "",
+        deleted: false,
+        session:sessionID
+      }))
+    );
+
+    // Step 5: Update session.specializations with new specialization IDs
+    const newSpecIds = newSpecDocs.map((doc) => doc._id);
+    sessionDoc.specializations.push(...newSpecIds);
+    await sessionDoc.save();
+
+    // Step 6: Fetch and return updated specializations under this session
+    const updatedSpecs = await specializationModel.find({"session" : sessionID})
+
+    res.status(200).json({
+      success: true,
+      message: "Specializations updated successfully",
+      data: updatedSpecs,
+    });
+  } catch (err) {
+    next(err);
+  }
 };

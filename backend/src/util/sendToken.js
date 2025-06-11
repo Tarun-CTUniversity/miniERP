@@ -2,7 +2,7 @@ const AppError = require("./ErrorHandler");
 
 exports.sendToken = async(user,res,next)=>{
     try{
-        const token = await user.createToken();
+        const token = await user.generateAuthToken();
         if(!token){
             throw new AppError("Problem while creating Token",400);
         }

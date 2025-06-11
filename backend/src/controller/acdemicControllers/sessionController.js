@@ -170,7 +170,7 @@ exports.updateSessionName = async (req, res, next) => {
 // Get all session names with IDs
 exports.getSessionNames = async (req, res, next) => {
     try {
-        const sessions = await sessionModel.find().select("name -_id");
+        const sessions = await sessionModel.find().select("name");
 
         if (sessions.length === 0) {
             throw new AppError("No sessions found", 404);
